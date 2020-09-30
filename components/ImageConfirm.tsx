@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   View,
@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {Icon, Overlay, Divider, ListItem, Button} from 'react-native-elements';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 type Props = {
   uri: string;
@@ -19,10 +19,25 @@ type Props = {
 };
 
 const positions = ['Top', 'Middle', 'Bottom'];
+const pests = [
+  {id: 1, name: 'Helicoverpa', count: 0},
+  {id: 2, name: 'Spider mites', count: 0},
+  {id: 3, name: 'Whiteflies', count: 0},
+  {id: 4, name: 'Mirids', count: 0},
+];
 
 const ImageConfirm = (props: Props) => {
   const {uri, imageCount, onConfirm, onCancel} = props;
   const [overlayVisible, setOverlayVisible] = useState(false);
+  const [pestsState, setPestsState] = useState(pests);
+
+  const increasePestCount = (id: number) => {
+    const newState = [...pestsState];
+    const index = newState.findIndex((pest) => pest.id === id);
+    newState[index] = {...newState[index], count: newState[index].count + 1};
+    setPestsState(newState);
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1}}>
@@ -56,7 +71,7 @@ const ImageConfirm = (props: Props) => {
                 justifyContent: 'center',
               }}>
               <Text style={{color: 'white', fontWeight: 'bold', fontSize: 24}}>
-                {(imageCount % 3) + 1}
+                {imageCount + 1}
               </Text>
             </View>
             <Text style={{fontSize: 24, color: 'white', marginLeft: 20}}>
@@ -85,56 +100,39 @@ const ImageConfirm = (props: Props) => {
             onPress={() => setOverlayVisible(true)}
           />
         </View>
-        <Overlay isVisible={overlayVisible} overlayStyle={{width: '90%', borderRadius: 10}} onBackdropPress={() => setOverlayVisible(false)}>
+        <Overlay
+          isVisible={overlayVisible}
+          overlayStyle={{width: '90%', borderRadius: 10}}
+          onBackdropPress={() => setOverlayVisible(false)}>
           <>
-            <Text style={{marginVertical: 10, textAlign: 'center', fontSize: 20}}>Detected Pests</Text>
+            <Text
+              style={{marginVertical: 10, textAlign: 'center', fontSize: 20}}>
+              Detected Pests
+            </Text>
             <Divider />
             <ScrollView style={{maxHeight: 200}}>
-              <ListItem
-                title="Pest 1"
-                titleStyle={{fontWeight: 'bold'}}
-                leftIcon={<Icon name="bug" type="font-awesome-5" />}
-                rightIcon={
-                  <Icon
-                    name="plus"
-                    size={16}
-                    type="font-awesome-5"
-                    reverse={true}
-                    color={Colors.dark}
-                    raised={true}
-                  />
-                }
-              />
-              <ListItem
-                title="Pest 2"
-                titleStyle={{fontWeight: 'bold'}}
-                leftIcon={<Icon name="bug" type="font-awesome-5" />}
-                rightIcon={
-                  <Icon
-                    name="plus"
-                    size={16}
-                    type="font-awesome-5"
-                    reverse={true}
-                    color={Colors.dark}
-                    raised={true}
-                  />
-                }
-              />
-              <ListItem
-                title="Pest 3"
-                titleStyle={{fontWeight: 'bold'}}
-                leftIcon={<Icon name="bug" type="font-awesome-5" />}
-                rightIcon={
-                  <Icon
-                    name="plus"
-                    size={16}
-                    type="font-awesome-5"
-                    reverse={true}
-                    color={Colors.dark}
-                    raised={true}
-                  />
-                }
-              />
+              {pestsState.map((pest) => (
+                <ListItem
+                  title={pest.name}
+                  key={pest.id}
+                  titleStyle={{fontWeight: 'bold'}}
+                  leftIcon={<Icon name="bug" type="font-awesome-5" />}
+                  rightTitle={pest.count ? '' + pest.count : ''}
+                  rightIcon={
+                    <Icon
+                      name="plus"
+                      size={16}
+                      type="font-awesome-5"
+                      reverse={true}
+                      color={Colors.dark}
+                      raised={true}
+                      onPress={() =>
+                        pest.count < 10 ? increasePestCount(pest.id) : null
+                      }
+                    />
+                  }
+                />
+              ))}
             </ScrollView>
             <View style={{alignItems: 'center'}}>
               <Button
@@ -156,7 +154,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
   },
   btn: {
     margin: 10,

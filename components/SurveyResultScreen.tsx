@@ -17,31 +17,33 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 type Props = {
   navigation: any;
+  route: any;
 };
 
 type State = {};
 
-class ChooseLangScreen extends PureComponent<Props, State> {
+class SurveyResultScreen extends PureComponent<Props, State> {
   constructor(props: any) {
     super(props);
   }
   render() {
-    const {navigation} = this.props;
+    const {navigation, route} = this.props;
+    const {images} = route.params;
     return (
       <>
         <StatusBar barStyle="dark-content" backgroundColor="white" />
         <SafeAreaView style={styles.container}>
           <View style={styles.body}>
             <View style={styles.header}>
-              <Text style={styles.sectionTitle}>Choose your language</Text>
+              <Text style={styles.sectionTitle}>Survey Results</Text>
             </View>
-            <View style={styles.btnsContainer}>
-              <Button
-                title="English"
-                buttonStyle={styles.btn}
-                onPress={() => navigation.navigate('ChooseCropScreen')}
-              />
-              <Button title="اردو" buttonStyle={styles.btn} />
+            <View style={{padding: 20}}>
+              <Text>
+                You took {images.length} image{images.length > 1 ? 's' : ''} in
+                1 mile of area. Here is what you need to do:
+              </Text>
+              <Text>Add Urea (2 Kg)</Text>
+              <Text>Add Armada</Text>
             </View>
           </View>
         </SafeAreaView>
@@ -80,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChooseLangScreen;
+export default SurveyResultScreen;

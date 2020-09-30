@@ -16,12 +16,11 @@ import {
   View,
   Text,
   Animated,
-  GestureResponderEvent,
+  ToastAndroid,
 } from 'react-native';
-import {Icon, Overlay, Divider, Button} from 'react-native-elements';
+import {Icon, Overlay, Button, Divider} from 'react-native-elements';
 import {RNCamera} from 'react-native-camera';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {TouchableNativeFeedback} from 'react-native-gesture-handler';
 import ImageConfirm from './ImageConfirm';
 
 type Props = {
@@ -39,6 +38,11 @@ const SurveyPestScreen = (props: Props) => {
   const [snapBtnVisible, setSnapBtnVisible] = useState(false);
   const [imageConfirmVisible, setImageConfirmVisible] = useState(false);
   const [nextViewVisible, setNextViewVisible] = useState(false);
+  const [surveyEndOverlayVisible, setSurveyEndOverlayVisible] = useState(false);
+  const [
+    surveyDiscardOverlayVisible,
+    setSurveyDiscardOverlayVisible,
+  ] = useState(false);
   const [images, addImage] = useState<string[]>([]);
   const [currentImageUri, setCurrentImageUri] = useState<string | undefined>(
     undefined,
@@ -87,6 +91,14 @@ const SurveyPestScreen = (props: Props) => {
     setCameraReady(true);
   };
 
+  const showToast = () => {
+    ToastAndroid.showWithGravity(
+      'Take picture at another spot',
+      ToastAndroid.LONG,
+      ToastAndroid.CENTER,
+    );
+  };
+
   const hideOverlay = () => {
     setOverlayVisible(false);
     setSnapBtnVisible(true);
@@ -101,6 +113,7 @@ const SurveyPestScreen = (props: Props) => {
 
   const onImageConfirmed = () => {
     setImageConfirmVisible(false);
+    showToast();
     if (currentImageUri) {
       addImage((prevImages) => [...prevImages, currentImageUri]);
     }
@@ -115,6 +128,27 @@ const SurveyPestScreen = (props: Props) => {
     setNextViewVisible(true);
     animation.start();
   };
+
+  const toggleSurveEndOverlay = () => {
+    setSurveyEndOverlayVisible(!surveyEndOverlayVisible);
+  };
+
+  const toggleSurveDiscardOverlay = () => {
+    setSurveyDiscardOverlayVisible(!surveyDiscardOverlayVisible);
+  };
+
+  const finishSurvey = () => {
+    toggleSurveEndOverlay();
+    navigation.navigate('SurveyResultScreen', {
+      images,
+    });
+  };
+
+  const discardSurvey = () => {
+    toggleSurveDiscardOverlay();
+    addImage([]);
+  };
+
   return (
     <>
       <StatusBar
@@ -153,34 +187,96 @@ const SurveyPestScreen = (props: Props) => {
           />
         )}
         {!imageConfirmVisible && (
-          <View style={styles.footer}>
-            {/* <Icon
-              reverse={true}
-              name="flash"
-              type="font-awesome"
-              color="transparent"
-              size={30}
-              onPress={() => console.log('flash')}
-            /> */}
-            <Icon
-              reverse={true}
-              name="camera"
-              type="font-awesome"
-              size={40}
-              color="rgba(0, 0, 0, 0.5)"
-              containerStyle={{opacity: snapBtnVisible ? 1 : 0}}
-              onPress={takePicture}
-            />
-            {/* <Icon
-              reverse={true}
-              name="flash"
-              type="font-awesome"
-              color="rgba(0, 0, 0, 0)"
-              style={{opacity: 0}}
-              size={30}
-            /> */}
-          </View>
+          <>
+            <View style={styles.footer}>
+              <Icon
+                reverse={true}
+                name="check"
+                type="font-awesome-5"
+                containerStyle={{opacity: images.length > 0 ? 1 : 0}}
+                color="green"
+                size={30}
+                onPress={toggleSurveEndOverlay}
+              />
+              <Icon
+                reverse={true}
+                name="camera"
+                type="font-awesome-5"
+                size={40}
+                color="rgba(0, 0, 0, 0.5)"
+                containerStyle={{opacity: snapBtnVisible ? 1 : 0}}
+                onPress={takePicture}
+              />
+              <Icon
+                reverse={true}
+                name="times"
+                type="font-awesome-5"
+                color="#df0000"
+                containerStyle={{opacity: images.length > 0 ? 1 : 0}}
+                size={30}
+                onPress={toggleSurveDiscardOverlay}
+              />
+            </View>
+          </>
         )}
+        <Overlay
+          isVisible={surveyEndOverlayVisible}
+          onBackdropPress={toggleSurveEndOverlay}
+          overlayStyle={{width: '90%', borderRadius: 10, padding: 15}}>
+          <>
+            <Text style={{fontSize: 24, marginVertical: 10}}>
+              Finish Survey?
+            </Text>
+            <Text style={{marginTop: 10, marginBottom: 20}}>
+              Are you sure you want to end this survey and go to the
+              <Text style={{fontWeight: 'bold'}}>results</Text>?
+            </Text>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+              <Button
+                type="outline"
+                title="No"
+                onPress={toggleSurveEndOverlay}
+                containerStyle={{width: 100}}
+              />
+              <Button
+                type="solid"
+                title="Yes"
+                containerStyle={{width: 100}}
+                onPress={finishSurvey}
+              />
+            </View>
+          </>
+        </Overlay>
+        <Overlay
+          isVisible={surveyDiscardOverlayVisible}
+          onBackdropPress={toggleSurveDiscardOverlay}
+          overlayStyle={{width: '90%', borderRadius: 10,padding: 15}}>
+          <>
+            <Text style={{fontSize: 24, marginVertical: 10}}>
+              Discard Survey?
+            </Text>
+            <Text style={{marginTop: 10, marginBottom: 20}}>
+              Are you sure you want to end this survey and{' '}
+              <Text style={{fontWeight: 'bold'}}>discard</Text> the results?
+            </Text>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+              <Button
+                type="outline"
+                title="No"
+                containerStyle={{width: 100}}
+                onPress={toggleSurveDiscardOverlay}
+              />
+              <Button
+                type="solid"
+                title="Yes"
+                containerStyle={{width: 100}}
+                onPress={discardSurvey}
+              />
+            </View>
+          </>
+        </Overlay>
         <Overlay
           isVisible={!overlayShown && overlayVisible}
           overlayStyle={{width: '90%', borderRadius: 10}}>

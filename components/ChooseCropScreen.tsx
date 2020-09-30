@@ -17,8 +17,16 @@ import {
   StatusBar,
   Image,
   ScrollView,
+  TouchableHighlight,
 } from 'react-native';
-import {Card, Overlay, ListItem, Divider, Icon} from 'react-native-elements';
+import {
+  Card,
+  Overlay,
+  ListItem,
+  Divider,
+  Icon,
+  Button,
+} from 'react-native-elements';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {TouchableNativeFeedback} from 'react-native-gesture-handler';
 import {Calendar} from 'react-native-calendars';
@@ -68,9 +76,26 @@ const crops = [
 const ChooseCropScreen = (props: Props) => {
   const {navigation} = props;
   const [visible, setVisible] = useState(false);
+  const [sendRequestOverlayVisible, setSendRequestOverlayVisible] = useState(
+    false,
+  );
+  const [sentRequestOverlayVisible, setSentRequestOverlayVisible] = useState(
+    false,
+  );
   const [selectedCrop, setSelectedCrop] = useState<string | null>(null);
   const toggleOverlay = () => {
     setVisible(!visible);
+  };
+  const toggleSendRequestOverlayVisible = () => {
+    setSendRequestOverlayVisible(!sendRequestOverlayVisible);
+  };
+  const toggleSentRequestOverlayVisible = () => {
+    setSentRequestOverlayVisible(!sentRequestOverlayVisible);
+  };
+
+  const showSentRequestOverlay = () => {
+    toggleSendRequestOverlayVisible();
+    toggleSentRequestOverlayVisible();
   };
 
   return (
@@ -100,9 +125,24 @@ const ChooseCropScreen = (props: Props) => {
           </ScrollView>
           <ScrollView style={styles.cardsContainer}>
             <Card
-              title={'Agri Calender'}
               containerStyle={styles.cardContainer}
-              titleStyle={styles.cardTitle}>
+              titleStyle={{display: 'none'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <Icon
+                  name="calendar-check"
+                  color="#56c125"
+                  type="font-awesome-5"
+                  size={24}
+                />
+                <Text style={{marginLeft: 15, fontSize: 20, flex: 1}}>
+                  Agri Calendar
+                </Text>
+              </View>
               <Calendar
                 // Initially visible month. Default = Date()
                 // current={'2012-03-01'}l;
@@ -169,28 +209,101 @@ const ChooseCropScreen = (props: Props) => {
               />
             </Card>
             <Card
-              title={'Track Locust'}
               containerStyle={styles.cardContainer}
-              titleStyle={styles.cardTitle}>
-              <Text>Hello World</Text>
+              titleStyle={{display: 'none'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <Image
+                  source={require('../assets/locust.png')}
+                  style={{width: 24, height: 24}}
+                />
+                <Text style={{marginLeft: 15, fontSize: 20, flex: 1}}>
+                  Track Locust
+                </Text>
+                <Icon
+                  name="facebook-messenger"
+                  type="font-awesome-5"
+                  size={24}
+                  onPress={toggleSendRequestOverlayVisible}
+                />
+              </View>
+              <Image
+                style={{
+                  borderRadius: 5,
+                  marginTop: 30,
+                  width: 350,
+                  height: 200,
+                }}
+                source={require('../assets/locust_map.jpg')}
+              />
             </Card>
             <Card
-              title={'News'}
               containerStyle={styles.cardContainer}
-              titleStyle={styles.cardTitle}>
-              <Text>Hello World</Text>
+              titleStyle={{display: 'none'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <Icon
+                  name="cloud-sun-rain"
+                  color="#56c125"
+                  type="font-awesome-5"
+                  size={24}
+                />
+                <Text style={{marginLeft: 15, fontSize: 20, flex: 1}}>
+                  Weather Alerts
+                </Text>
+                <Icon
+                  name="facebook-messenger"
+                  type="font-awesome-5"
+                  size={24}
+                  onPress={toggleSendRequestOverlayVisible}
+                />
+              </View>
+              <Image
+                style={{
+                  borderRadius: 5,
+                  marginTop: 30,
+                  width: 350,
+                  height: 200,
+                }}
+                source={require('../assets/pakistan-weather-map.jpg')}
+              />
             </Card>
             <Card
-              title={'Card 1'}
-              containerStyle={styles.cardContainer}
-              titleStyle={styles.cardTitle}>
-              <Text>Hello World</Text>
-            </Card>
-            <Card
-              title={'Card 2'}
-              containerStyle={{...styles.cardContainer, marginBottom: 20}}
-              titleStyle={styles.cardTitle}>
-              <Text>Hello World</Text>
+              containerStyle={{
+                ...styles.cardContainer,
+                padding: 0,
+                marginBottom: 20,
+              }}
+              titleStyle={{display: 'none'}}>
+              <TouchableNativeFeedback
+                useForeground={true}
+                containerStyle={{padding: 15}}
+                onPressIn={() => navigation.navigate('MarketPlaceScreen')}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Icon
+                    name="search-dollar"
+                    color="#56c125"
+                    type="font-awesome-5"
+                    size={24}
+                  />
+                  <Text style={{marginLeft: 15, fontSize: 20, flex: 1}}>
+                    MarketPlace
+                  </Text>
+                </View>
+              </TouchableNativeFeedback>
             </Card>
           </ScrollView>
         </View>
@@ -203,7 +316,7 @@ const ChooseCropScreen = (props: Props) => {
               style={{textAlign: 'center', fontSize: 18, marginVertical: 10}}>
               What do you want to do?
             </Text>
-            <Divider style={{marginVertical: 10}}/>
+            <Divider style={{marginVertical: 10}} />
             <TouchableNativeFeedback>
               <ListItem
                 title="Detect pest"
@@ -228,6 +341,63 @@ const ChooseCropScreen = (props: Props) => {
                 }}
               />
             </TouchableNativeFeedback>
+          </>
+        </Overlay>
+        <Overlay
+          isVisible={sendRequestOverlayVisible}
+          onBackdropPress={toggleSendRequestOverlayVisible}
+          overlayStyle={{width: '90%', borderRadius: 10, padding: 15}}>
+          <>
+            <Text style={{fontSize: 24, marginVertical: 10}}>
+              Alert Authorities
+            </Text>
+            <Text style={{marginTop: 10, marginBottom: 20}}>
+              Send alert to govt. authorities for locust attack or flooding.
+              Govt. will use your personal and farm information to get back to
+              you.
+            </Text>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+              <Button
+                type="outline"
+                title="Cancel"
+                containerStyle={{width: 100}}
+                onPress={toggleSendRequestOverlayVisible}
+              />
+              <Button
+                type="solid"
+                title="Send"
+                containerStyle={{width: 100}}
+                onPress={showSentRequestOverlay}
+              />
+            </View>
+          </>
+        </Overlay>
+        <Overlay
+          isVisible={sentRequestOverlayVisible}
+          onBackdropPress={toggleSentRequestOverlayVisible}
+          overlayStyle={{width: '90%', borderRadius: 10, padding: 15}}>
+          <>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Icon
+                name="check"
+                color="#56c125"
+                type="font-awesome-5"
+                size={24}
+              />
+              <Text style={{fontSize: 24, marginVertical: 10, marginLeft: 15}}>Request Sent</Text>
+            </View>
+            <Text style={{marginTop: 10, marginBottom: 20}}>
+              Govt. will contact you soon.
+            </Text>
+            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+              <Button
+                type="solid"
+                title="OK"
+                containerStyle={{width: 100}}
+                onPress={toggleSentRequestOverlayVisible}
+              />
+            </View>
           </>
         </Overlay>
       </SafeAreaView>

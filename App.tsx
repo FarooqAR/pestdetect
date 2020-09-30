@@ -15,6 +15,8 @@ import ChooseLangScreen from './components/ChooseLangScreen';
 import ChooseCropScreen from './components/ChooseCropScreen';
 import DetectPestScreen from './components/DetectPestScreen';
 import SurveyPestScreen from './components/SurveyPestScreen';
+import MarketPlaceScreen from './components/MarketPlaceScreen';
+import SurveyResultScreen from './components/SurveyResultScreen';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +32,14 @@ class App extends PureComponent {
           <Stack.Screen name="ChooseCropScreen" component={ChooseCropScreen} />
           <Stack.Screen name="DetectPestScreen" component={DetectPestScreen} />
           <Stack.Screen name="SurveyPestScreen" component={SurveyPestScreen} />
+          <Stack.Screen
+            name="SurveyResultScreen"
+            component={SurveyResultScreen}
+          />
+          <Stack.Screen
+            name="MarketPlaceScreen"
+            component={MarketPlaceScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );
